@@ -44,26 +44,18 @@ void turnToHeading(double targetHeading);
 
 
 
-void pre_auton(void) {
+void pre_auton(void) 
+{
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
-  // motor_group RightDriveSmart = motor_group(leftMotorA, leftMotorB, leftMotorC);
-  // motor_group LeftDriveSmart = motor_group(rightMotorA, rightMotorB, rightMotorC);
-  // drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 319.19, 295, 40, mm, 1);
-  // motor IntakeMotorA = motor(PORT9, ratio18_1, false);
-  // motor IntakeMotorB = motor(PORT10, ratio18_1, true);
-  // motor_group Intake = motor_group(IntakeMotorA, IntakeMotorB);
-  // digital_out Clamp = digital_out(Brain.ThreeWirePort.H);
+  
 
-  RightDriveSmart.setVelocity(100, percent);
-  LeftDriveSmart.setVelocity(100, percent);
   Intake.setVelocity(100, percent);
-  Drivetrain.setTurnVelocity(100, percent);
-  Drivetrain.setDriveVelocity(100, percent);
-  Clamp.set(true);
-
-  Inertial.setHeading(0, degrees);
+  chassis.setTurnVelocity(100, percent);
+  chassis.setDriveVelocity(100, percent);
+  Clamp.set(false);
   Inertial.calibrate();
+  Inertial.setHeading(0, degrees);
   
   
   
@@ -99,46 +91,61 @@ void pre_auton(void) {
 void autonomous(void) 
 {
 
-  //Grab First Goal and Score Preload
-  Drivetrain.driveFor(reverse, 35, inches);
-  Clamp.set(false);
-  // Intake.spin(forward, 200, percent);
-  Intake.spin(forward, 200, percent);
-  wait(0.5, sec);
+  chassis.setHeading(0, degrees);
+  chassis.turnToHeading(315, degrees, true);
+  chassis.driveFor(reverse, 38, inches);
 
-  //Release First Goal, grab a second ring onto intake
-  Inertial.setHeading(-90, degrees); 
-  turnToHeading(-90);
-  // Drivetrain.turnFor(left, 90, degrees);
+// Clamping and outtaking ring
   Clamp.set(true);
-  //set inertial for dt turning if inertial sensors are added to the robot
-  Drivetrain.driveFor(forward, 15, inches);
-  Intake.spin(forward, 50, percent);
-  
-  wait(0.5, sec);
-
-  //Go and grab second goal
-  Inertial.setHeading(0, degrees); 
-  // Drivetrain.turnFor(left, 90, degrees);
-  turnToHeading(0);
-  Drivetrain.driveFor(reverse, 10, inches);
+  Intake.spin(forward);
+  wait(3, seconds);
+  Intake.stop();
   Clamp.set(false);
-  wait(0.5, sec);
+
+// Driving away to stop touching Mogo
+  chassis.driveFor(forward, 10, inches);
+  chassis.turnToHeading(0, degrees, true);
+
+  //Grab First Goal and Score Preload
+  // Drivetrain.driveFor(reverse, 35, inches);
+  // Clamp.set(false);
+  // wait(0.5, sec);
+  // // Intake.spin(forward, 200, percent);
+  // Intake.spin(forward, 200, percent);
+  // wait(0.5, sec);
+
+  // //Release First Goal, grab a second ring onto intake
+  // Inertial.setHeading(-90, degrees); 
+  // turnToHeading(-90);
+  // // Drivetrain.turnFor(left, 90, degrees);
+  // Clamp.set(true);
+  // wait(0.5, sec);
+  // Drivetrain.driveFor(forward, 15, inches);
+  // Intake.spin(forward, 50, percent);
+  // wait(0.5, sec);
+
+  // //Go and grab second goal
+  // Inertial.setHeading(0, degrees); 
+  // // Drivetrain.turnFor(left, 90, degrees);
+  // turnToHeading(0);
+  // Drivetrain.driveFor(reverse, 10, inches);
+  // Clamp.set(false);
+  // wait(0.5, sec);
 
 
-  //score ring
-  Intake.spin(forward, 100, percent);
-  Drivetrain.driveFor(forward, 5, inches);
+  // //score ring
+  // Intake.spin(forward, 100, percent);
+  // Drivetrain.driveFor(forward, 5, inches);
   
-  wait(0.5, sec);
+  // wait(0.5, sec);
 
 
-  //Turn and go to middle stake and touch it
-  Inertial.setHeading(90, degrees); 
-  // Drivetrain.turnFor(right, 90, degrees);
-  turnToHeading(90);
-  Drivetrain.driveFor(forward, 20, inches);  
-  wait(0.5, sec);
+  // //Turn and go to middle stake and touch it
+  // Inertial.setHeading(90, degrees); 
+  // // Drivetrain.turnFor(right, 90, degrees);
+  // turnToHeading(90);
+  // Drivetrain.driveFor(forward, 20, inches);  
+  // wait(0.5, sec);
 
   
   
@@ -160,9 +167,13 @@ void autonomous(void)
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void usercontrol(void) {
+void usercontrol(void) 
+{
   // User control code here, inside the loop
-  while (1) {
+  while (1) 
+  {
+    chassis.setTurnVelocity(100, percent);
+    
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
@@ -190,52 +201,51 @@ int main() {
   
 
   // Prevent main from exiting with an infinite loop.
-  while (true) {
+  while (true) 
+  {
     wait(100, msec);
   }
 }
 
-
 void turnToHeading(double targetHeading) 
 {
-  // Set the drivetrain to turn mode
-  Drivetrain.setTurnVelocity(50, percent);
- 
-  // Calculate the difference between the current heading and the target heading
-  double headingError = targetHeading - Inertial.heading();
- 
-  // Normalize the heading error to the range -180 to 180
-  if (headingError > 180) {
-    headingError -= 360;
-  } else if (headingError < -180) {
-    headingError += 360;
-  }
- 
-  // Turn the drivetrain until the heading error is within a certain tolerance
-  while (std::abs(headingError) > 5) {
-    // Update the heading error
-    headingError = targetHeading - Inertial.heading();
-   
-    // Normalize the heading error to the range -180 to 180
-    if (headingError > 180) {
+  // Set initial turn velocity (adjust as needed)
+  chassis.setTurnVelocity(50, percent);
+
+  // Loop until heading error is within tolerance
+  while (std::abs(targetHeading - Inertial.heading()) > 3) 
+  {  // Tolerance of 3 degrees
+    double headingError = targetHeading - Inertial.heading();
+    
+    // Normalize heading error
+    if (headingError > 180) 
+    {
       headingError -= 360;
-    } else if (headingError < -180) {
+    } 
+    else if (headingError < -180) 
+    {
       headingError += 360;
     }
-   
+
+    // Adjust turn velocity based on heading error
+    chassis.setTurnVelocity(std::abs(headingError) * 0.5, percent); // Linearly adjust velocity
+
     // Turn the drivetrain
-    if (headingError > 0) {
-      Drivetrain.turn(right);
-    } else {
-      Drivetrain.turn(left);
+    if (headingError > 0) 
+    {
+      chassis.turn(right);
+    } 
+    else 
+    {
+      chassis.turn(left);
     }
-   
-    // Wait for a short period of time before updating the heading error again
-    wait(20, msec);
+
+    // Short wait (adjust as needed)
+    wait(0.05, sec);
   }
- 
+
   // Stop the drivetrain
-  Drivetrain.stop();
+  chassis.stop();
 }
 
 
