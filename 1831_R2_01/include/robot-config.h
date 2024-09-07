@@ -6,7 +6,7 @@ using namespace vex;
 extern brain Brain;
 
 // VEXcode devices
-extern drivetrain Drivetrain;
+extern smartdrive chassis;
 extern motor_group Intake;
 extern digital_out Clamp;
 extern controller Controller1;
