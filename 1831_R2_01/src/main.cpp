@@ -44,31 +44,15 @@ void turnToHeading(double targetHeading);
 
 
 
-void pre_auton(void) {
-  // Initializing Robot Configuration. DO NOT REMOVE!
-  vexcodeInit();
-  // motor_group RightDriveSmart = motor_group(leftMotorA, leftMotorB, leftMotorC);
-  // motor_group LeftDriveSmart = motor_group(rightMotorA, rightMotorB, rightMotorC);
-  // drivetrain Drivetrain = drivetrain(LeftDriveSmart, RightDriveSmart, 319.19, 295, 40, mm, 1);
-  // motor IntakeMotorA = motor(PORT9, ratio18_1, false);
-  // motor IntakeMotorB = motor(PORT10, ratio18_1, true);
-  // motor_group Intake = motor_group(IntakeMotorA, IntakeMotorB);
-  // digital_out Clamp = digital_out(Brain.ThreeWirePort.H);
-
-  RightDriveSmart.setVelocity(100, percent);
-  LeftDriveSmart.setVelocity(100, percent);
-  Intake.setVelocity(100, percent);
-  Drivetrain.setTurnVelocity(100, percent);
-  Drivetrain.setDriveVelocity(100, percent);
-  Clamp.set(true);
-
-  Inertial.setHeading(0, degrees);
+void pre_auton(void) 
+{ 
+  chassis.setTurnVelocity(100, percent);
+  chassis.setDriveVelocity(100, percent);
+  Clamp.set(false);
   Inertial.calibrate();
-  
-  
-  
-
-
+  Inertial.setHeading(0, degrees);
+  Intake.setMaxTorque(100,percent);
+  Intake.setVelocity(100,percent);
   //set inertial for dt turning if inertial sensors are added to the robot
   //inertial Inertial = inertial(PORT*);
   //start calibration (must be done when sensor isnt moving)
@@ -83,7 +67,6 @@ void pre_auton(void) {
   // Example: clearing encoders, setting servo positions, ...
 
 }
-
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -93,57 +76,95 @@ void pre_auton(void) {
 /*                                                                           */
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
-
-
-
 void autonomous(void) 
 {
+  printf("AUTON\n");
+  
+  chassis.setDriveVelocity(50, percent);
+  Intake.setVelocity(100, percent);
+  Clamp.set(false);
+  wait(0.5, seconds);
+  chassis.driveFor(reverse, 36, inches, true);
+  
+  wait(0.5, seconds);
+  chassis.driveFor(reverse, 5.5, inches, false);
+  wait(0.2, sec);
+
+// Clamping and outtaking ring
+  Clamp.set(true);
+  // IntakeMotorA.spin(reverse, 100, percent);
+  // IntakeMotorB.spin(forward, 100, percent);
+  Intake.spin(reverse);
+  wait(5, seconds);
+  Intake.stop();
+  Clamp.set(false);
+
+
+// //go to second goal
+//   chassis.setHeading(315, degrees);
+//   chassis.turnToHeading(315, degrees, true);
+//   chassis.driveFor(reverse, 34.941125497, inches, true);
+//   Clamp.set(true);
+
+// //go to second ring
+//   chassis.setHeading(180, degrees);
+//   chassis.turnToHeading(180, degrees, true);
+//   wait(1, seconds);
+//   chassis.driveFor(forward, 25, inches, true);
+
+// //intake second ring and drop it
+//   // Intake.spin(forward, 200, volt);
+//   IntakeMotorA.spin(reverse, 100, percent);
+//   IntakeMotorB.spin(forward, 100, percent);
+//   wait(1, seconds);
+//   Intake.stop();
+//   Clamp.set(false);
+
+
+// Driving away to stop touching Mogo
+  // chassis.driveFor(forward, 10, inches);
+  // chassis.turnToHeading(0, degrees, true);
 
   //Grab First Goal and Score Preload
-  Drivetrain.driveFor(reverse, 35, inches);
-  Clamp.set(false);
+  // Drivetrain.driveFor(reverse, 35, inches);
+  // Clamp.set(false);
+  // wait(0.5, sec);
+  // // Intake.spin(forward, 200, percent);
   // Intake.spin(forward, 200, percent);
-  Intake.spin(forward, 200, percent);
-  wait(0.5, sec);
+  // wait(0.5, sec);
 
-  //Release First Goal, grab a second ring onto intake
-  Inertial.setHeading(-90, degrees); 
-  turnToHeading(-90);
-  // Drivetrain.turnFor(left, 90, degrees);
-  Clamp.set(true);
-  //set inertial for dt turning if inertial sensors are added to the robot
-  Drivetrain.driveFor(forward, 15, inches);
-  Intake.spin(forward, 50, percent);
+  // //Release First Goal, grab a second ring onto intake
+  // Inertial.setHeading(-90, degrees); 
+  // turnToHeading(-90);
+  // // Drivetrain.turnFor(left, 90, degrees);
+  // Clamp.set(true);
+  // wait(0.5, sec);
+  // Drivetrain.driveFor(forward, 15, inches);
+  // Intake.spin(forward, 50, percent);
+  // wait(0.5, sec);
+
+  // //Go and grab second goal
+  // Inertial.setHeading(0, degrees); 
+  // // Drivetrain.turnFor(left, 90, degrees);
+  // turnToHeading(0);
+  // Drivetrain.driveFor(reverse, 10, inches);
+  // Clamp.set(false);
+  // wait(0.5, sec);
+
+
+  // //score ring
+  // Intake.spin(forward, 100, percent);
+  // Drivetrain.driveFor(forward, 5, inches);
   
-  wait(0.5, sec);
-
-  //Go and grab second goal
-  Inertial.setHeading(0, degrees); 
-  // Drivetrain.turnFor(left, 90, degrees);
-  turnToHeading(0);
-  Drivetrain.driveFor(reverse, 10, inches);
-  Clamp.set(false);
-  wait(0.5, sec);
+  // wait(0.5, sec);
 
 
-  //score ring
-  Intake.spin(forward, 100, percent);
-  Drivetrain.driveFor(forward, 5, inches);
-  
-  wait(0.5, sec);
-
-
-  //Turn and go to middle stake and touch it
-  Inertial.setHeading(90, degrees); 
-  // Drivetrain.turnFor(right, 90, degrees);
-  turnToHeading(90);
-  Drivetrain.driveFor(forward, 20, inches);  
-  wait(0.5, sec);
-
-  
-  
-  
-  
+  // //Turn and go to middle stake and touch it
+  // Inertial.setHeading(90, degrees); 
+  // // Drivetrain.turnFor(right, 90, degrees);
+  // turnToHeading(90);
+  // Drivetrain.driveFor(forward, 20, inches);  
+  // wait(0.5, sec);
 
   // ..........................................................................
   // Insert autonomous user code here.
@@ -160,9 +181,132 @@ void autonomous(void)
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
-void usercontrol(void) {
+void auton_skills() 
+{
+  chassis.setDriveVelocity(75, percent);
+  chassis.setTurnVelocity(40, percent);
+  Intake.setVelocity(100, percent);
+
+
+  Clamp.set(false);
+  wait(500, msec);
+  chassis.driveFor(reverse, 18, inches, true);
+  chassis.setDriveVelocity(30, percent);
+  chassis.driveFor(reverse, 6, inches, false);
+  Clamp.set(true);
+  wait(500, msec);
+  chassis.setDriveVelocity(75, percent);
+  Intake.spin(reverse);
+  wait(3, sec);
+  Intake.stop();
+  chassis.turnToHeading(90, degrees);
+  wait(500, msec);
+  chassis.driveFor(reverse, 24, inches, true);
+  wait(500, msec);
+  chassis.turnToHeading(135, degrees);
+  wait(500, msec);
+  chassis.driveFor(reverse, 34.8822509939, inches, true);
+  Clamp.set(false);
+  wait(500, msec);
+
+
+  // //get first mobile goal and score pre-load
+  // Clamp.set(true);
+  // wait(500, msec);
+  // chassis.driveFor(reverse, 9, inches, true);
+  // Clamp.set(false);
+  // wait(50, msec);
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+  // //go to second ring
+  // chassis.setHeading(180, degrees);
+  // chassis.turnToHeading(180, degrees, true);
+  // chassis.driveFor(forward, 24, inches, true);
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+
+
+
+  // //TODO:
+  // //go to second ring
+  // chassis.setHeading(270, degrees);
+  // chassis.turnToHeading(270, degrees, true);
+  // chassis.driveFor(forward, 24, inches, true);
+
+
+
+  // //score second ring
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+
+
+  // //go to third ring
+  // chassis.setHeading(180, degrees);
+  // chassis.turnToHeading(180, degrees, true);
+  // chassis.driveFor(forward, 24, inches, true);
+
+
+
+
+  // //score third ring
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+
+  // //go to fourth ring
+  // chassis.driveFor(forward, 12, inches, true);
+
+
+
+  // //score fourth ring
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+
+  // //go to fifth ring
+  // chassis.setHeading(45, degrees);
+  // chassis.turnToHeading(45, degrees, true);
+  // chassis.driveFor(forward, 16.9705627485, inches, true);
+
+
+  // //score fifth ring
+  // Intake.spin(forward);
+  // wait(500, msec);
+  // Intake.stop();
+
+
+  // //put the goal into the corner
+  // chassis.setHeading(-15, degrees);
+  // chassis.turnToHeading(-15, degrees, true);
+  // chassis.driveFor(reverse, 26.83281573, inches, true);
+  // Clamp.set(true);
+
+
+  //Note: if have time, do a skills stop time
+
+}
+
+
+
+
+
+
+void usercontrol(void) 
+{
+  vexcodeInit();
   // User control code here, inside the loop
-  while (1) {
+  while (1) 
+  {
+    chassis.setTurnVelocity(100, percent);
+    
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
@@ -183,59 +327,62 @@ void usercontrol(void) {
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   pre_auton();
+  Competition.autonomous(auton_skills);
   Competition.autonomous(autonomous);
+
+  //interswitch auton_skills and autonomous based on whether doing tournament matches or programming skills
+
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
   
 
   // Prevent main from exiting with an infinite loop.
-  while (true) {
+  while (true) 
+  {
     wait(100, msec);
   }
 }
 
-
 void turnToHeading(double targetHeading) 
 {
-  // Set the drivetrain to turn mode
-  Drivetrain.setTurnVelocity(50, percent);
- 
-  // Calculate the difference between the current heading and the target heading
-  double headingError = targetHeading - Inertial.heading();
- 
-  // Normalize the heading error to the range -180 to 180
-  if (headingError > 180) {
-    headingError -= 360;
-  } else if (headingError < -180) {
-    headingError += 360;
-  }
- 
-  // Turn the drivetrain until the heading error is within a certain tolerance
-  while (std::abs(headingError) > 5) {
-    // Update the heading error
-    headingError = targetHeading - Inertial.heading();
-   
-    // Normalize the heading error to the range -180 to 180
-    if (headingError > 180) {
+  // Set initial turn velocity (adjust as needed)
+  chassis.setTurnVelocity(50, percent);
+
+  // Loop until heading error is within tolerance
+  while (std::abs(targetHeading - Inertial.heading()) > 3) 
+  {  // Tolerance of 3 degrees
+    double headingError = targetHeading - Inertial.heading();
+    
+    // Normalize heading error
+    if (headingError > 180) 
+    {
       headingError -= 360;
-    } else if (headingError < -180) {
+    } 
+    else if (headingError < -180) 
+    {
       headingError += 360;
     }
-   
+
+    // Adjust turn velocity based on heading error
+    chassis.setTurnVelocity(std::abs(headingError) * 0.5, percent); // Linearly adjust velocity
+
     // Turn the drivetrain
-    if (headingError > 0) {
-      Drivetrain.turn(right);
-    } else {
-      Drivetrain.turn(left);
+    if (headingError > 0) 
+    {
+      chassis.turn(right);
+    } 
+    else 
+    {
+      chassis.turn(left);
     }
-   
-    // Wait for a short period of time before updating the heading error again
-    wait(20, msec);
+
+    // Short wait (adjust as needed)
+    wait(0.05, sec);
   }
- 
+
   // Stop the drivetrain
-  Drivetrain.stop();
+  chassis.stop();
 }
 
 
